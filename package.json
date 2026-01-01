@@ -23,26 +23,26 @@
     "viewsContainers": {
       "panel": [
         {
-          "id": "python-live-panel",
-          "title": "Python-Live",
+          "id": "atomic-flow-panel",
+          "title": "Atomic Flow",
           "icon": "$(type-hierarchy-sub)"
         }
       ]
     },
     "views": {
-      "python-live-panel": [
+      "atomic-flow-panel": [
         {
           "type": "webview",
-          "id": "python-live.graphView",
-          "name": "Dependencies"
+          "id": "atomic-flow.graphView",
+          "name": "Atomic Flow Graph"
         }
       ]
     },
     "commands": [
       {
-        "command": "python-live.refresh",
-        "title": "Refresh Dependencies",
-        "category": "Python-Live"
+        "command": "atomic-flow.refresh",
+        "title": "Refresh Graph",
+        "category": "Atomic Flow"
       }
     ]
   },
