@@ -7,7 +7,7 @@
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rakaarwaky/atomic-flow"
+    "url": "https://github.com/arwaky90/AtomicFlow"
   },
   "engines": {
     "vscode": "^1.96.0"
