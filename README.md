@@ -83,6 +83,18 @@ If you find Atomic Flow helpful, consider buying me a coffee!
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rakaarwaky)
 
+## 🗺️ Roadmap
+
+Check out our [2026 Development Roadmap](ROADMAP.md) to see what's coming next!
+
+**Highlights:**
+- 🔧 Q1: Go & C# support, Git integration
+- 🤖 Q2: AI-powered architecture insights
+- ✂️ Q3: Visual drag & drop refactoring
+- 👥 Q4: Team collaboration features
+
+Your donations help prioritize these features!
+
 ## 🔗 Links
 
 - [Open VSX](https://open-vsx.org/extension/rakaarwaky/atomic-flow)
