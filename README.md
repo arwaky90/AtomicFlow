@@ -2,8 +2,8 @@
 
 **The Future of Coding. Move beyond text editors with a powerful Node-based Visual Interface for your architecture.**
 
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://open-vsx.org/extension/rakaarwaky/atomic-flow)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-2.1.1-blue.svg)](https://open-vsx.org/extension/rakaarwaky/atomic-flow)
+[![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-Published-blueviolet)](https://open-vsx.org/extension/rakaarwaky/atomic-flow)
 
 ## 🚀 Features
@@ -104,7 +104,7 @@ Your donations help prioritize these features!
 
 ## 📄 License
 
-MIT License - See [LICENSE](LICENSE) for details.
+Apache License 2.0 - See [LICENSE](LICENSE) for details.
 
 ---
 
