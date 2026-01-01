@@ -2,12 +2,16 @@
   "name": "atomic-flow",
   "displayName": "Atomic Flow",
   "description": "Atomic Flow - The Future of Coding. Move beyond text editors with a powerful Node-based Visual Interface for your architecture.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "publisher": "rakaarwaky",
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/arwaky90/AtomicFlow"
+  },
+  "homepage": "https://github.com/arwaky90/AtomicFlow#readme",
+  "bugs": {
+    "url": "https://github.com/arwaky90/AtomicFlow/issues"
   },
   "engines": {
     "vscode": "^1.96.0"
