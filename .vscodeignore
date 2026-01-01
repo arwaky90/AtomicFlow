@@ -1,0 +1,26 @@
+# Development files
+.vscode/**
+.vscode-test/**
+src/**
+**/*.ts
+tsconfig.json
+
+# Build artifacts (keep out/ folder)
+node_modules/**
+*.vsix
+
+# Test files
+tests/**
+debug.js
+*.test.js
+*.spec.js
+
+# Git
+.git/**
+.gitignore
+
+# Misc
+*.md
+!README.md
+*.log
+.DS_Store
