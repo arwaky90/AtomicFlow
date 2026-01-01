@@ -89,9 +89,9 @@ Your donations directly fund development time and infrastructure.
 
 ## 📣 Get Involved
 
-- ⭐ [Star on GitHub](https://github.com/arwaky90/AtomicFlow)
-- 🐛 [Report Issues](https://github.com/arwaky90/AtomicFlow/issues)
-- 💡 [Request Features](https://github.com/arwaky90/AtomicFlow/issues/new)
+- ⭐ [Star on GitHub](https://github.com/rakaarwaky/AtomicFlow)
+- 🐛 [Report Issues](https://github.com/rakaarwaky/AtomicFlow/issues)
+- 💡 [Request Features](https://github.com/rakaarwaky/AtomicFlow/issues/new)
 - ☕ [Buy Me a Coffee](https://buymeacoffee.com/rakaarwaky)
 
 ---

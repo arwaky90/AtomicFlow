@@ -2,7 +2,7 @@
 
 **The Future of Coding. Move beyond text editors with a powerful Node-based Visual Interface for your architecture.**
 
-[![Version](https://img.shields.io/badge/version-2.1.1-blue.svg)](https://open-vsx.org/extension/rakaarwaky/atomic-flow)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://open-vsx.org/extension/rakaarwaky/atomic-flow)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-Published-blueviolet)](https://open-vsx.org/extension/rakaarwaky/atomic-flow)
 
@@ -98,8 +98,8 @@ Your donations help prioritize these features!
 ## 🔗 Links
 
 - [Open VSX](https://open-vsx.org/extension/rakaarwaky/atomic-flow)
-- [GitHub Repository](https://github.com/arwaky90/AtomicFlow)
-- [Report Issues](https://github.com/arwaky90/AtomicFlow/issues)
+- [GitHub Repository](https://github.com/rakaarwaky/AtomicFlow)
+- [Report Issues](https://github.com/rakaarwaky/AtomicFlow/issues)
 - [Buy Me a Coffee](https://buymeacoffee.com/rakaarwaky)
 
 ## 📄 License
