@@ -1,0 +1,63 @@
+{
+  "name": "atomic-flow",
+  "displayName": "Atomic Flow",
+  "description": "Atomic Flow - The Future of Coding. Move beyond text editors with a powerful Node-based Visual Interface for your architecture.",
+  "version": "1.0.2",
+  "publisher": "rakaarwaky",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rakaarwaky/atomic-flow"
+  },
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Visualization"
+  ],
+  "activationEvents": [
+    "onLanguage:python"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "python-live-panel",
+          "title": "Python-Live",
+          "icon": "$(type-hierarchy-sub)"
+        }
+      ]
+    },
+    "views": {
+      "python-live-panel": [
+        {
+          "type": "webview",
+          "id": "python-live.graphView",
+          "name": "Dependencies"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "python-live.refresh",
+        "title": "Refresh Dependencies",
+        "category": "Python-Live"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "package": "vsce package --allow-missing-repository",
+    "mcp": "node out/mcpServer.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.96.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}

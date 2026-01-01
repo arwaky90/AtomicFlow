@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://d3js.org; img-src data:;">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="header">
+        <div>
+            <h3 id="title">🐍 Loading...</h3>
+            <p id="stats">0 nodes · 0 links</p>
+        </div>
+        <div id="controls">
+            <button id="toggleDepth">Direct Only</button>
+            <input type="text" id="searchBox" placeholder="Search..." />
+            <button id="exportBtn">📸 Export</button>
+            <button id="copyBtn">📋 Copy</button>
+        </div>
+    </div>
+    <div id="status">Click node to open | Alt+Click for impact | Right-click to focus</div>
+    <svg></svg>
+    <script src="main.js"></script>
+</body>
+</html>
