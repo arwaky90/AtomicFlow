@@ -77,11 +77,18 @@ Create `.atomic-flow-rules.json` in your workspace root:
 | Vue | `.vue` | Extracts from `<script>` |
 | Rust | `.rs` | `use crate::`, `mod x;` |
 
+## ☕ Support
+
+If you find Atomic Flow helpful, consider buying me a coffee!
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/rakaarwaky)
+
 ## 🔗 Links
 
 - [Open VSX](https://open-vsx.org/extension/rakaarwaky/atomic-flow)
 - [GitHub Repository](https://github.com/arwaky90/AtomicFlow)
 - [Report Issues](https://github.com/arwaky90/AtomicFlow/issues)
+- [Buy Me a Coffee](https://buymeacoffee.com/rakaarwaky)
 
 ## 📄 License
 
