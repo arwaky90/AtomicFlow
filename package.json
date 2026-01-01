@@ -2,7 +2,7 @@
   "name": "atomic-flow",
   "displayName": "Atomic Flow",
   "description": "Atomic Flow - The Future of Coding. Move beyond text editors with a powerful Node-based Visual Interface for your architecture.",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "publisher": "rakaarwaky",
   "license": "GPL-3.0",
   "repository": {
@@ -16,7 +16,13 @@
     "Visualization"
   ],
   "activationEvents": [
-    "onLanguage:python"
+    "onLanguage:python",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact",
+    "onLanguage:vue",
+    "onLanguage:rust"
   ],
   "main": "./out/extension.js",
   "contributes": {

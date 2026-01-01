@@ -36,7 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildGraph = buildGraph;
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
-const parser_1 = require("./parser");
+const parsers_1 = require("./parsers");
 const resolver_1 = require("./resolver");
 const archLinter_1 = require("./archLinter");
 function buildGraph(filePath, workspaceRoot, maxDepth = 2) {
@@ -46,13 +46,21 @@ function buildGraph(filePath, workspaceRoot, maxDepth = 2) {
     const archRules = (0, archLinter_1.loadArchRules)(workspaceRoot);
     const addNode = (p, impCount, d, externalLibs = []) => {
         const rel = path.relative(workspaceRoot, p);
+        const ext = path.extname(p);
         if (!nodes.some(n => n.id === rel)) {
+            let lineCount = 0;
+            try {
+                const content = fs.readFileSync(p, 'utf-8');
+                const parser = parsers_1.ParserFactory.getParser(ext);
+                lineCount = parser ? parser.getLineCount(content) : content.split('\n').length;
+            }
+            catch (e) { }
             nodes.push({
                 id: rel,
-                name: path.basename(p, '.py'),
+                name: path.basename(p, ext),
                 imports: impCount,
                 depth: d,
-                lines: (0, parser_1.getLineCount)(p),
+                lines: lineCount,
                 externalLibs: externalLibs.length > 0 ? externalLibs : undefined
             });
         }
@@ -63,51 +71,65 @@ function buildGraph(filePath, workspaceRoot, maxDepth = 2) {
             fp = fs.realpathSync(fp);
         }
         catch (e) { }
-        let imports = [];
+        const ext = path.extname(fp);
+        const parser = parsers_1.ParserFactory.getParser(ext);
+        if (!parser)
+            return; // Unsupported file type
         let importDetails = [];
         try {
-            importDetails = (0, parser_1.parseImportsDetailed)(fs.readFileSync(fp, 'utf-8'));
-            imports = importDetails.map(i => i.module);
+            const content = fs.readFileSync(fp, 'utf-8');
+            importDetails = parser.parseImports(content);
         }
         catch (e) { }
         const externalLibs = importDetails.filter(i => i.isExternal).map(i => i.module);
+        // Python-specific: skip __init__.py files
         const isInit = path.basename(fp) === '__init__.py';
         let sourceRel = '';
         if (!isInit || fp === filePath) {
-            sourceRel = addNode(fp, imports.length, depth, externalLibs);
+            sourceRel = addNode(fp, importDetails.length, depth, externalLibs);
         }
         if (depth >= maxDepth || visited.has(fp))
             return;
         visited.add(fp);
         if (isInit && fp !== filePath)
             return;
-        for (const imp of imports) {
+        for (const impInfo of importDetails) {
+            const imp = impInfo.module;
             const target = (0, resolver_1.resolveModule)(imp, fp, workspaceRoot);
             if (target) {
                 try {
                     const targetReal = fs.realpathSync(target);
-                    if (path.basename(targetReal) === '__init__.py') {
+                    const targetExt = path.extname(targetReal);
+                    const targetParser = parsers_1.ParserFactory.getParser(targetExt);
+                    // Python-specific: handle __init__.py
+                    if (path.basename(targetReal) === '__init__.py' && targetParser) {
                         try {
-                            const initImports = (0, parser_1.parseImports)(fs.readFileSync(targetReal, 'utf-8'));
-                            for (const subImp of initImports) {
-                                const subTarget = (0, resolver_1.resolveModule)(subImp, targetReal, workspaceRoot);
+                            const initContent = fs.readFileSync(targetReal, 'utf-8');
+                            const initImports = targetParser.parseImports(initContent);
+                            for (const subImpInfo of initImports) {
+                                const subTarget = (0, resolver_1.resolveModule)(subImpInfo.module, targetReal, workspaceRoot);
                                 if (subTarget) {
                                     try {
                                         const subTargetReal = fs.realpathSync(subTarget);
                                         if (path.basename(subTargetReal) === '__init__.py')
                                             continue;
+                                        const subExt = path.extname(subTargetReal);
+                                        const subParser = parsers_1.ParserFactory.getParser(subExt);
                                         let subImpCount = 0;
-                                        try {
-                                            subImpCount = (0, parser_1.parseImports)(fs.readFileSync(subTargetReal, 'utf-8')).length;
+                                        if (subParser) {
+                                            try {
+                                                const subContent = fs.readFileSync(subTargetReal, 'utf-8');
+                                                subImpCount = subParser.parseImports(subContent).length;
+                                            }
+                                            catch (e) { }
                                         }
-                                        catch (e) { }
                                         const subTargetRel = addNode(subTargetReal, subImpCount, depth + 1);
                                         if (sourceRel !== subTargetRel) {
                                             const violation = (0, archLinter_1.validateEdge)(sourceRel, subTargetRel, archRules);
                                             edges.push({
                                                 source: sourceRel,
                                                 target: subTargetRel,
-                                                module: `${imp} -> ${subImp}`,
+                                                module: `${imp} -> ${subImpInfo.module}`,
                                                 violation: violation || undefined
                                             });
                                             process(subTargetReal, depth + 1);
@@ -121,10 +143,13 @@ function buildGraph(filePath, workspaceRoot, maxDepth = 2) {
                     }
                     else {
                         let targetImpCount = 0;
-                        try {
-                            targetImpCount = (0, parser_1.parseImports)(fs.readFileSync(targetReal, 'utf-8')).length;
+                        if (targetParser) {
+                            try {
+                                const targetContent = fs.readFileSync(targetReal, 'utf-8');
+                                targetImpCount = targetParser.parseImports(targetContent).length;
+                            }
+                            catch (e) { }
                         }
-                        catch (e) { }
                         const targetRel = addNode(targetReal, targetImpCount, depth + 1);
                         if (sourceRel !== targetRel) {
                             const violation = (0, archLinter_1.validateEdge)(sourceRel, targetRel, archRules);

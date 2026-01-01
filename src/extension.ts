@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { buildGraph } from './graphBuilder';
+import { ParserFactory } from './parsers';
 
 class PythonLiveProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'atomic-flow.graphView';
@@ -66,7 +67,7 @@ class PythonLiveProvider implements vscode.WebviewViewProvider {
     private async copyImageToClipboard(data: number[]) {
         // VS Code webview doesn't have direct clipboard access for images
         // So we save temp file and notify user
-        const tmpPath = path.join(require('os').tmpdir(), 'python-live-graph.png');
+        const tmpPath = path.join(require('os').tmpdir(), 'atomic-flow-graph.png');
         fs.writeFileSync(tmpPath, Buffer.from(data));
         vscode.window.showInformationMessage(`Graph saved to ${tmpPath}. You can now copy it!`, 'Open')
             .then(selection => {
@@ -92,12 +93,20 @@ class PythonLiveProvider implements vscode.WebviewViewProvider {
         if (!this._view) return;
         
         const editor = vscode.window.activeTextEditor;
-        if (!editor || !editor.document.fileName.endsWith('.py')) {
+        if (!editor) {
             this._view.webview.html = this.getEmptyHtml();
             return;
         }
         
         const filePath = editor.document.fileName;
+        const ext = path.extname(filePath);
+        
+        // Check if file type is supported
+        if (!ParserFactory.getParser(ext)) {
+            this._view.webview.html = this.getEmptyHtml();
+            return;
+        }
+        
         const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath || path.dirname(filePath);
         const graph = buildGraph(filePath, workspaceRoot, this._currentDepth);
         const rootName = path.basename(filePath);
