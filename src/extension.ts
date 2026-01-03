@@ -1,187 +1,95 @@
+// src/extension.ts - FIXED: DeepSeek's singleton pattern with proper dispose
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs';
-import { buildGraph } from './graphBuilder';
-import { ParserFactory } from './parsers';
-
-class PythonLiveProvider implements vscode.WebviewViewProvider {
-    public static readonly viewType = 'atomic-flow.graphView';
-    private _view?: vscode.WebviewView;
-    private _currentDepth: number = 1;
-    private _cachedData: any = null;
-
-    constructor(private readonly _extensionUri: vscode.Uri) {}
-
-    public resolveWebviewView(webviewView: vscode.WebviewView) {
-        this._view = webviewView;
-        webviewView.webview.options = { 
-            enableScripts: true, 
-            localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, 'media')]
-        };
-        
-        webviewView.webview.onDidReceiveMessage(message => {
-            if (message.command === 'clientReady') {
-                if (this._cachedData) {
-                    this._view?.webview.postMessage(this._cachedData);
-                }
-            } else {
-                this.handleMessage(message);
-            }
-        });
-        
-        this.refresh();
-    }
-
-    private async handleMessage(message: any) {
-        switch (message.command) {
-            case 'toggleDepth':
-                this._currentDepth = message.depth;
-                this.refresh();
-                break;
-            case 'openFile':
-                await this.openFile(message.path);
-                break;
-            case 'copyImage':
-                await this.copyImageToClipboard(message.data);
-                break;
-            case 'saveImage':
-                await this.saveImage(message.data);
-                break;
-        }
-    }
-
-
-    private async openFile(relativePath: string) {
-        const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
-        if (workspaceRoot) {
-            const fullPath = path.join(workspaceRoot, relativePath);
-            try {
-                const doc = await vscode.workspace.openTextDocument(fullPath);
-                await vscode.window.showTextDocument(doc);
-            } catch (err) {
-                console.error("Could not open file", fullPath, err);
-            }
-        }
-    }
-
-    private async copyImageToClipboard(data: number[]) {
-        // VS Code webview doesn't have direct clipboard access for images
-        // So we save temp file and notify user
-        const tmpPath = path.join(require('os').tmpdir(), 'atomic-flow-graph.png');
-        fs.writeFileSync(tmpPath, Buffer.from(data));
-        vscode.window.showInformationMessage(`Graph saved to ${tmpPath}. You can now copy it!`, 'Open')
-            .then(selection => {
-                if (selection === 'Open') {
-                    vscode.env.openExternal(vscode.Uri.file(tmpPath));
-                }
-            });
-    }
-
-    private async saveImage(data: number[]) {
-        const uri = await vscode.window.showSaveDialog({
-            defaultUri: vscode.Uri.file('dependency-graph.png'),
-            filters: { 'Images': ['png'] }
-        });
-        
-        if (uri) {
-            fs.writeFileSync(uri.fsPath, Buffer.from(data));
-            vscode.window.showInformationMessage(`Graph saved to ${uri.fsPath}`);
-        }
-    }
-
-    public refresh() {
-        if (!this._view) return;
-        
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            this._view.webview.html = this.getEmptyHtml();
-            return;
-        }
-        
-        const filePath = editor.document.fileName;
-        const ext = path.extname(filePath);
-        
-        // Check if file type is supported
-        if (!ParserFactory.getParser(ext)) {
-            this._view.webview.html = this.getEmptyHtml();
-            return;
-        }
-        
-        const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath || path.dirname(filePath);
-        const graph = buildGraph(filePath, workspaceRoot, this._currentDepth);
-        const rootName = path.basename(filePath);
-        
-        
-        this._view.webview.html = this.getWebviewHtml();
-        
-        // Cache data and wait for 'clientReady'
-        this._cachedData = {
-            command: 'renderGraph',
-            graph: graph,
-            rootFile: rootName,
-            currentDepth: this._currentDepth
-        };
-    }
-
-    private getEmptyHtml(): string {
-        return `
-            <html>
-            <body style="background:#1e1e1e;color:#fff;font-family:system-ui;padding:20px;">
-                <h3>⚛️ Atomic Flow</h3>
-                <p>Open a Python file to start.</p>
-            </body>
-            </html>
-        `;
-    }
-
-    private getWebviewHtml(): string {
-        if (!this._view) return '';
-        
-        const mediaUri = vscode.Uri.joinPath(this._extensionUri, 'media');
-        const styleUri = this._view.webview.asWebviewUri(vscode.Uri.joinPath(mediaUri, 'style.css'));
-        const scriptUri = this._view.webview.asWebviewUri(vscode.Uri.joinPath(mediaUri, 'main.js'));
-        const d3Uri = 'https://d3js.org/d3.v7.min.js';
-        
-        return `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${this._view.webview.cspSource} 'unsafe-inline'; script-src 'unsafe-inline' ${this._view.webview.cspSource} https://d3js.org; img-src data:;">
-                <script src="${d3Uri}"></script>
-                <link rel="stylesheet" href="${styleUri}">
-            </head>
-            <body>
-                <div id="header">
-                    <div>
-                        <h3 id="title">⚛️ Atomic Flow</h3>
-                        <p id="stats">0 nodes · 0 links</p>
-                    </div>
-                    <div id="controls">
-                        <button id="toggleDepth">Direct Only</button>
-                        <input type="text" id="searchBox" placeholder="Search..." />
-                        <button id="exportBtn">📸 Export</button>
-                        <button id="copyBtn">📋 Copy</button>
-                    </div>
-                </div>
-                <div id="status">Click node to open | Alt+Click for impact | Right-click to focus</div>
-                <svg></svg>
-                <script src="${scriptUri}"></script>
-            </body>
-            </html>
-        `;
-    }
-}
 
 export function activate(context: vscode.ExtensionContext) {
-    const provider = new PythonLiveProvider(context.extensionUri);
+    console.log('🔧 Atomic Flow SHELL activated');
     
-    context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider(PythonLiveProvider.viewType, provider),
-        vscode.window.onDidChangeActiveTextEditor(() => provider.refresh()),
-        vscode.workspace.onDidSaveTextDocument(() => provider.refresh()),
-        vscode.commands.registerCommand('atomic-flow.refresh', () => provider.refresh())
+    let currentActivation: any = null;
+    let registeredDisposables: vscode.Disposable[] = [];
+    
+    const activateLogic = () => {
+        try {
+            const logicPath = path.join(context.extensionPath, 'out', 'extensionLogic.js');
+            
+            // 1. CLEAR CACHE - aggressive
+            Object.keys(require.cache).forEach(key => {
+                if (key.includes(path.join(context.extensionPath, 'out'))) {
+                    delete require.cache[key];
+                    console.log(`🧹 Cleared: ${path.basename(key)}`);
+                }
+            });
+            
+            // 2. Dispose previous registrations (CRITICAL FIX!)
+            registeredDisposables.forEach(d => {
+                try { d.dispose(); } catch (e) { /* ignore */ }
+            });
+            registeredDisposables = [];
+            
+            // 3. Deactivate previous logic
+            if (currentActivation?.deactivate) {
+                currentActivation.deactivate();
+            }
+            
+            // 4. Require fresh module
+            delete require.cache[require.resolve(logicPath)];
+            const ExtensionLogic = require(logicPath);
+            
+            // 5. Activate with tracking
+            if (ExtensionLogic.activate) {
+                const newDisposables = ExtensionLogic.activate(context);
+                if (Array.isArray(newDisposables)) {
+                    registeredDisposables = newDisposables;
+                    newDisposables.forEach(d => {
+                        if (!context.subscriptions.includes(d)) {
+                            context.subscriptions.push(d);
+                        }
+                    });
+                }
+            }
+            
+            currentActivation = ExtensionLogic;
+            console.log('✅ Hot reload successful');
+            vscode.window.showInformationMessage('🔥 Atomic Flow: Reloaded!');
+            
+        } catch (error: any) {
+            console.error('❌ Hot reload failed:', error);
+            vscode.window.showErrorMessage(`Atomic Flow error: ${error.message}`);
+        }
+    };
+    
+    // Initial activation
+    activateLogic();
+    
+    // Watch for changes in out/ and media/
+    const watcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(context.extensionUri, '{out,media}/**/*.{js,css,html}')
     );
+    
+    // Watch trigger file
+    const triggerWatcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(context.extensionUri, '.hot-reload-trigger')
+    );
+    
+    let timeout: NodeJS.Timeout;
+    const debouncedReload = () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(activateLogic, 500);
+    };
+    
+    watcher.onDidChange(debouncedReload);
+    watcher.onDidCreate(debouncedReload);
+    triggerWatcher.onDidChange(debouncedReload);
+    triggerWatcher.onDidCreate(debouncedReload);
+    
+    // Manual reload command
+    const reloadCmd = vscode.commands.registerCommand('atomic-flow.reloadFrontend', () => {
+        activateLogic();
+    });
+    
+    context.subscriptions.push(watcher, triggerWatcher, reloadCmd);
 }
 
-export function deactivate() {}
+export function deactivate() {
+    console.log('Atomic Flow SHELL deactivated');
+}

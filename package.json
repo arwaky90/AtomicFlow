@@ -2,8 +2,9 @@
   "name": "atomic-flow",
   "displayName": "Atomic Flow",
   "description": "Atomic Flow - The Future of Coding. Move beyond text editors with a powerful Node-based Visual Interface for your architecture.",
-  "version": "0.1.0",
+  "version": "4.1.3",
   "publisher": "rakaarwaky",
+
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -13,7 +14,6 @@
   "bugs": {
     "url": "https://github.com/rakaarwaky/AtomicFlow/issues"
   },
-  "icon": "media/icon.png",
   "funding": {
     "type": "individual",
     "url": "https://buymeacoffee.com/rakaarwaky"
@@ -49,22 +49,35 @@
         {
           "type": "webview",
           "id": "atomic-flow.graphView",
-          "name": "Atomic Flow Graph"
+          "name": "Atomic Flow Graph",
+          "icon": "media/icon.png"
         }
       ]
     },
     "commands": [
       {
         "command": "atomic-flow.refresh",
-        "title": "Refresh Graph",
-        "category": "Atomic Flow"
+        "title": "Restart Atomic Flow",
+        "category": "Atomic Flow",
+        "icon": "$(refresh)"
       }
-    ]
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "atomic-flow.refresh",
+          "when": "view == atomic-flow.graphView",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "compile": "tsc -p ./",
     "package": "vsce package --allow-missing-repository",
-    "mcp": "node out/mcpServer.js"
+    "mcp": "node out/mcpServer.js",
+    "test:webview": "npm run test --prefix webview-ui",
+    "test:webview:ui": "npm run test:ui --prefix webview-ui"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.5.0"

@@ -6,7 +6,11 @@ src/**
 tsconfig.json
 
 # Build artifacts (keep out/ folder)
-node_modules/**
+!node_modules/**
+webview-ui/**
+atomic-flow-engine/target/**
+!atomic-flow-engine/target/release/atomic-flow-engine
+atomic-flow-engine/node_modules/**
 *.vsix
 
 # Test files

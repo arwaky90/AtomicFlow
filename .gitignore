@@ -1,0 +1,22 @@
+node_modules/
+out/
+dist/
+*.vsix
+.DS_Store
+.vscode-test/
+.vscode/
+*.log
+
+# Rust
+target/
+**/*.rs.bk
+
+# Webview
+webview-ui/node_modules/
+webview-ui/dist/
+webview-ui/build/
+
+# Misc
+.hot-reload-trigger
+plan/
+atom
